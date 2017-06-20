@@ -9,9 +9,9 @@ const cb = () => {
         var clone = document.importNode(template, true);
         shadowRoot.appendChild(clone);
 
-        this.el = shadowRoot.querySelector('span');
+        this.el = shadowRoot.querySelector('.smile');
 
-        this.setSmile(this.hasAttribute('smile'));
+        this.setSmile(JSON.parse(this.getAttribute('smile')));
     };
 
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
