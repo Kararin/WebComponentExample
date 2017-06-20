@@ -1,44 +1,33 @@
- // Refers to the "importer", which is index.html
-    var thatDoc = document;
-    // Refers to the "importee", which is src/hello-world.html
-    var thisDoc =  (thatDoc._currentScript || thatDoc.currentScript).ownerDocument;
-    // Gets content from <template>
-    var template = thisDoc.querySelector('template').content;
-    // Creates an object based in the HTML Element prototype
-    var MyElementProto = Object.create(HTMLElement.prototype);
-    // Creates the "who" attribute and sets a default value
-    MyElementProto.who = 'World';
-    // Fires when an instance of the element is created
+var thisDoc = (document._currentScript || document.currentScript).ownerDocument;
+
+const cb = () => {
+    var template = thisDoc.querySelector('template').content,
+        MyElementProto = Object.create(HTMLElement.prototype);
+
     MyElementProto.createdCallback = function() {
-        // Creates the shadow root
         var shadowRoot = this.createShadowRoot();
-        // Adds a template clone into shadow root
-        var clone = thatDoc.importNode(template, true);
+        var clone = document.importNode(template, true);
         shadowRoot.appendChild(clone);
-        // Caches <strong> DOM query
-        this.strong = shadowRoot.querySelector('strong');
-        // Checks if the "who" attribute has been overwritten
-        if (this.hasAttribute('who')) {
-            var who = this.getAttribute('who');
-            this.setWho(who);
-        }
-        else {
-            this.setWho(this.who);
-        }
+
+        this.el = shadowRoot.querySelector('span');
+
+        this.setSmile(this.hasAttribute('smile'));
     };
-    // Fires when an attribute was added, removed, or updated
+
     MyElementProto.attributeChangedCallback = function(attr, oldVal, newVal) {
-        if (attr === 'who') {
-            this.setWho(newVal);
+        if (attr === 'smile') {
+            this.setSmile(JSON.parse(newVal));
         }
     };
-    // Sets new value to "who" attribute
-    MyElementProto.setWho = function(val) {
-        this.who = val;
-        // Sets "who" value into <strong>
-        this.strong.textContent = this.who;
+
+    MyElementProto.setSmile = function(val) {
+        this.el.innerHTML = val ? '&#9786;' : '&#9785;';
     };
-    // Registers <hello-world> in the main document
-    window.MyElement = thatDoc.registerElement('hello-world', {
+
+    window.MyElement = document.registerElement('my-smiley', {
         prototype: MyElementProto
     });
+
+};
+
+thisDoc.addEventListener('DOMContentLoaded', cb);
